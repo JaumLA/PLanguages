@@ -1,0 +1,9 @@
+(* int list --> int *)
+(* produces the product of all the elements on the list *)
+fun list_product (xs : int list) =
+    if null xs
+    then 1
+    else hd xs + sum_list(tl xs);
+(* tests *)
+
+val test1 = list_product [] = 1;

@@ -1,0 +1,57 @@
+(* EX.1 *)
+fun compose_opt f g x =
+    case g x of
+	NONE   => NONE
+      | SOME v => f v
+		    
+(* EX.2 *)
+fun do_until f p x =
+    case p x of
+	false => x
+      | true  => do_until f p (f x)
+
+fun fact n = #1 (do_until (fn (acc, x) => (acc * x, x - 1)) (fn (acc, x) => x >= 1) (1, n))
+
+fun fixed_point f x = do_until f (fn y => f y <> y) x
+
+fun map2 f (x, y) = (f x, f y)
+
+fun app_all f g x =
+    let
+	val xs = g x
+	fun helper ys =
+	    case xs of
+		[] => []
+	      | element :: rest => f element @ helper rest
+    in
+	helper xs		
+    end
+
+fun foldr f init xs = List.foldl f init (List.rev xs)
+		
+fun partition f xs =
+    case xs of
+	[]        => ([], [])
+      | x :: rest => let val acc = partition f rest
+		     in
+			 if f x
+			 then (x :: (#1 acc), (#2 acc))
+			 else ((#1 acc), x :: (#2 acc))
+		     end
+
+fun unfold f s = 
+    case f s of
+	NONE        => []
+      | SOME (x, y) => x :: unfold f y
+
+fun fact_fold n = List.foldl (fn (x, acc) => acc * x) 1
+			     (unfold (fn x => if x <= 0 then NONE else SOME (x, x - 1)) n)
+
+fun map f xs = List.foldr (fn (x, acc) => f x :: acc) [] xs
+
+fun filter f xs = List.foldr (fn (x, acc) => if f x then x :: acc else acc) [] xs
+
+			     
+
+
+datatype 'a tree = Leaf

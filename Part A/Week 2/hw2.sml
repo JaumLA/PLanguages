@@ -1,0 +1,191 @@
+(* Dan Grossman, Coursera PL, HW2 Provided Code *)
+
+(* if you use this function to compare two strings (returns true if the same
+   string), then you avoid several of the functions in problem 1 having
+   polymorphic types that may be confusing *)
+fun same_string (s1 : string, s2 : string) =
+    s1 = s2
+
+
+fun all_except_option (listOfString : string list, str : string) =
+    case listOfString of
+	[] => NONE
+      | element :: restList => if same_string(element, str)
+			       then SOME restList
+			       else case all_except_option(restList, str) of
+					SOME lst => SOME(element :: lst)
+				      | NONE => NONE
+	     
+fun get_substitutions1 (substitutionList : (string list) list, substitute : string) =
+    case substitutionList of
+	[] => []
+      | listOfString :: restSubstitution => case all_except_option(listOfString, substitute) of
+						NONE => get_substitutions1(restSubstitution, substitute)
+					      | SOME ListWithout => ListWithout @ get_substitutions1(restSubstitution, substitute)
+
+fun get_substitutions2 (substitutionList : (string list) list, substitute : string) =
+    let
+	fun get_sub_tail (subList : (string list) list, result : string list) =
+	    case subList of
+		[] => result
+	      | listOfString :: restSub => case all_except_option(listOfString, substitute) of
+					       NONE => get_sub_tail(restSub, result)
+					     | SOME ListWithout => get_sub_tail(restSub, (result @ ListWithout))
+    in
+	get_sub_tail(substitutionList, [])
+    end
+
+	
+fun similar_names (substitutionList : (string list) list, {first=f, last=l, middle=m}) =
+    let
+	fun all_names (allFirstList : string list) =
+	    case allFirstList of
+		[] => []
+	      | sub :: subFirst => {first=sub,last=l,middle=m} :: all_names(subFirst)
+
+	val listExcluded = get_substitutions1(substitutionList, f)
+    in
+	{first=f,last=l,middle=m} :: all_names(listExcluded)
+    end
+
+					   
+(* you may assume that Num is always used with values 2, 3, ..., 10
+   though it will not really come up *)
+datatype suit = Clubs | Diamonds | Hearts | Spades
+datatype rank = Jack | Queen | King | Ace | Num of int 
+type card = suit * rank
+
+datatype color = Red | Black
+datatype move = Discard of card | Draw 
+
+exception IllegalMove
+
+(* put your solutions for problem 2 here *)
+
+fun card_color (c : suit * rank) =
+    case c of
+	(Spades, _) => Black
+      | (Clubs, _) => Black
+      | (Diamonds, _) => Red
+      | (Hearts, _) => Red
+
+fun card_value (c : suit * rank) =
+    case c of
+	(_, Num r) => r
+      | (_, Ace) => 11
+      | (_, _) => 10
+
+		      
+		      
+fun remove_card (cardList : card list, c : card, e : exn) =
+    case cardList of
+	[] => raise e
+      | element :: restList => if c = element
+			       then restList
+			       else element :: remove_card(restList, c, e)
+
+fun all_same_color (cardList : card list) =
+    case cardList of
+	[] => true
+      | element :: [] => true
+      | element :: secondElem :: restList => card_color(element) = card_color(secondElem) andalso all_same_color(secondElem :: restList)
+
+fun sum_cards (cardList : card list) =
+    let
+	fun sum_cards_tail (cardList : card list, sum : int) =
+	    case cardList of
+		[] => sum
+	      | element :: restList => sum_cards_tail(restList, sum + card_value(element))
+						     
+    in
+	sum_cards_tail(cardList, 0)
+    end
+
+fun score (cardList : card list, goal : int) =
+    let
+	val isAllSameColor = all_same_color(cardList)
+	val handSum = sum_cards(cardList)
+	val preScore = if handSum > goal then 3 * (handSum - goal) else goal - handSum
+    in
+	case isAllSameColor of
+	    true => preScore div 2
+	  | false => preScore
+    end
+
+fun officiate (cards : card list, moves : move list, goal : int) =
+    let
+	fun execute_rounds (cards:card list, moves:move list, hand:card list) =
+	    case (cards, moves, (sum_cards(hand) > goal)) of
+		([], _, _) => score(hand, goal)
+		| (_, [], _) => score(hand, goal)
+		| (_, _, true) => score(hand, goal)
+		| (_, (Discard c)::restM, _) => execute_rounds(cards, restM, remove_card(hand, c, IllegalMove))
+		| ((firstCard::restCards), (Draw)::restM, _) => execute_rounds(restCards, restM, firstCard::hand)
+    in
+	execute_rounds(cards, moves, [])
+    end
+
+	
+(* Challenges *)
+
+fun score_challenge (cardList : card list, goal : int) =
+    let
+	fun count_aces (cardList : card list) =
+	    case cardList of
+		[] => 0
+	      | element :: rest => if card_value(element) = 11
+				   then 1 + count_aces(rest)
+				   else count_aces(rest)
+
+	val numAces = count_aces(cardList)
+	val preHandSum = sum_cards(cardList) - (11*numAces)
+
+	fun one_or_eleven (aces : int, sum : int) =
+	    case aces of
+		0 => sum
+	      | _ => if sum + 11 <= goal
+		     then one_or_eleven(aces - 1, sum + 11)
+		     else one_or_eleven(aces - 1, sum + 1)
+	
+	val isAllSameColor = all_same_color(cardList)
+	val handSum = one_or_eleven(numAces, preHandSum)
+	val preScore = if handSum > goal then 3 * (handSum - goal) else goal - handSum
+    in
+	case isAllSameColor of
+	    true => preScore div 2
+	  | false => preScore
+    end
+
+fun officiate_challenge (cards : card list, moves : move list, goal : int) =
+    let
+	fun execute_rounds (cards:card list, moves:move list, hand:card list) =
+	    case (cards, moves, (sum_cards(hand) > goal)) of
+		([], _, _) => score_challenge(hand, goal)
+	      | (_, [], _) => score_challenge(hand, goal)
+	      | (_, _, true) => score_challenge(hand, goal)
+	      | (_, (Discard c)::restM, _) => execute_rounds(cards, restM, remove_card(hand, c, IllegalMove))
+	      | ((firstCard::restCards), (Draw)::restM, _) => execute_rounds(restCards, restM, firstCard::hand)
+    in
+	execute_rounds(cards, moves, [])
+    end
+
+fun careful_player (cardList : card list, goal : int) =
+    let
+	fun is_possible_get_zero (hand : card list, handWithout : card list, c : card) =
+	    case handWithout of
+		[] => []
+	      | x :: rest => if score(c::remove_card(hand, x, IllegalMove), goal) = 0
+			     then [Discard x]
+			     else is_possible_get_zero(hand, rest, c)
+			  
+	fun accumulate_moves (cardList : card list, hand : card list) =
+	    case (cardList, score(hand, goal), goal > sum_cards(hand) + 10) of
+		([], _, _) => []
+	      | (firstCard :: rest, _, true) => Draw :: accumulate_moves(rest, firstCard :: hand)
+	      | (_, 0, _) => []
+	      | (firstCard :: rest, _, _) => case is_possible_get_zero(hand, hand, firstCard) of
+						 [] => []
+					       | c :: _ => [c, Draw]
+    in
+	accumulate_moves (cardList, [])
+    end
