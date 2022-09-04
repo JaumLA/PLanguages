@@ -1,4 +1,9 @@
+(* take a list of integers, loi, and add its numbers in alternating
+   sign. For example: alternate {n1, n2, ..., ns} ->
+   n1 - n2 + n3 - ... + (-1)^(s + 1)*ns *)
 fun alternate (loi : int list) =
+    (* this helper function keep track of the pos parity to 
+       alternate the signs at even positions *)
     let fun alternate_list (loi : int list, pos : int) =
 	    if null loi
 	    then 0
@@ -9,6 +14,8 @@ fun alternate (loi : int list) =
 	alternate_list(loi, 1)
     end
 
+(* take a list of integers and returns a pair with the minimum
+   and the maximum value of the list (min, max) *)
 fun min_max (loi : int list) =
     let
 	fun helper (loi : int list, min : int, max : int) =
@@ -25,6 +32,9 @@ fun min_max (loi : int list) =
 	helper(loi, hd(loi), hd(loi))
     end
 
+(* take a list of integers and return a list with a partial sums.
+   The partial sum of list {n1, n2, ..., ns} is given by 
+   {n1, n1+n2, n1+n2+n3, ..., n1 + n2 + ... + ns} *)
 fun cumsum (loi : int list) =
     let
 	fun partial_sum (loi : int list, sum : int) =
@@ -38,11 +48,15 @@ fun cumsum (loi : int list) =
 	partial_sum(loi, 0)
     end
 
+(* given a string option SOME name returns "Hello there, valOf(name)!", if it is NONE then return "Hello there, you!" *)
 fun greeting (name : string option) = 	
     if isSome name
     then "Hello there, "^valOf(name)^"!"
     else "Hello there, you!"				 
 
+(* take two list of integers, l1 and l2, and repeat the integers from first list at
+   index i by x times, where x is the integer at index i in list 2. Assume 
+   the two list have the same size. *)
 fun repeat (numbers : int list, each_times : int list) =
     if null numbers
     then []
@@ -57,11 +71,15 @@ fun repeat (numbers : int list, each_times : int list) =
 	repeat(tl(numbers), tl(each_times))
     end
 
+(* take two int option, and return their sum if the two aren't NONE,
+   else return NONE. *)
 fun add_opt (num1 : int option, num2 : int option) =
     if isSome num1 andalso isSome num2
     then SOME(valOf(num1) + valOf(num2))
     else NONE
 
+(* given a list of option int, return the sum of all values which aren't
+   NONE, if the list is empty or all values are NONE then return NONE. *)
 fun add_all_opt (loi : (int option) list) =
     if null loi
     then NONE
@@ -76,21 +94,30 @@ fun add_all_opt (loi : (int option) list) =
 	    else anws
 	end
 
+(* given a list of bool, lob, return true if at least one of 
+   the values are true, else return false. *)
 fun any (lob : bool list) =
     if null lob
     then false
     else hd(lob) orelse any(tl(lob))
 
+(* given a list of bool, lob, return true if all the values are true,
+   else return false. *)
 fun all (lob : bool list) =
     if null lob
     then true
     else hd(lob) andalso all(tl(lob))
 
+(* given two list of integers, loi1 and loi2, return a list
+   of pairs {{num1_1,num2_1}, {num1_2, num2_2}, ..., {num1_n, num_n}},
+   where n = min(size(loi1), size(loi2)) and num1_i is in loi1, num2_i in loi2
+   for 1 <= i <= n, if loi1 or loi2 is empty return an empty list. *)
 fun zip (loi1 : int list, loi2: int list) =
     if null loi1 orelse null loi2
     then []
     else (hd(loi1), hd(loi2)) :: zip(tl(loi1), tl(loi2))
 
+(* Challenge: Write a version zipRecycle of zip, where when one list is empty it starts recycling from its start until the other list completes. For example: zipRecycle ([1,2,3], [1, 2, 3, 4, 5, 6, 7]) = [(1,1), (2,2), (3, 3), (1,4), (2,5), (3,6), (1,7)] *)
 fun zip_recycle (loi1 : int list, loi2: int list) =
     if null loi1 orelse null loi2
     then []
@@ -339,7 +366,7 @@ This should end up being a list of all the divisors of the number n that gave ri
 Example: all_products([(2,2), (5,1)]) = [1,2,4,5,10,20]. 
 For extra challenge, your recursive process should return the numbers in this order, as opposed to sorting them afterwards. *)
 	    
-fun all_products (lof : (int * int) list) =
+(*fun all_products (lof : (int * int) list) =
     if null lof orelse #2 (hd(lof)) = 0
     then []
     else
@@ -362,5 +389,5 @@ fun all_products (lof : (int * int) list) =
 		else
 	    val multiplied_prod = 1 :: multiply_times(lof, 1)
 	in
-	    multiplied_prod
-	end
+	    (*multiplied_prod*)
+	end*)
