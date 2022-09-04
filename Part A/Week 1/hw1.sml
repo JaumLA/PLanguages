@@ -79,7 +79,7 @@ fun date_to_string (date : (int*int*int)) =
     end
 
 
-(* Return the first n numbers of the list that add less than sum. *)
+(* Return the first n number of the list that add less than sum. *)
 fun number_before_reaching_sum (sum : int, numbers : int list) =
     if sum <= hd(numbers)
     then 0
@@ -93,9 +93,9 @@ fun what_month (day : int) =
 	number_before_reaching_sum(day, days_in_month) + 1
     end
 
-(* Takes two days of an year, day1 and day2, and returns an int list
-[m1,m2,...,mN] where m1 is the month of day1, m2 is the month of day1 + 1, ..., and 
-mn is the month of day2. *)	
+(* Takes two days of the year day1 and day2 and returns an int list
+[m1,m2,...,mn] where m1 is the month of day1, m2 is the month of day1+1, ..., and 
+mn is the month of day day2. *)	
 fun month_range (day1 : int, day2 : int) =
     if day1 > day2
     then []
@@ -114,22 +114,19 @@ fun oldest (dates : (int*int*int) list) =
 		     then oldest_nonempty(tl(dates), date)
 		     else oldest_nonempty(tl(dates), hd(dates))
 				    
-	    val first_date = hd(dates) (* a starter date for the helper function*)
+	    val first_date = hd(dates)
 	in
 	    oldest_nonempty(dates, first_date)
 	end
 
 (* Helper functions for challenge problems 11. *)
-
-(* Take a list of int and remove the first ocurrence of num. *)	
 fun remove (numbers : int list, num : int) = 
     if null numbers
     then []
     else if hd(numbers) = num
          then remove(tl(numbers), num)
          else hd(numbers) :: (remove(tl(numbers), num))
-
-(* Take a list of integers and returns a list with no repetition of int.*)
+				   
 fun create_unique_list (numbers : int list) =
     let
 	val answ = remove(tl(numbers), hd(numbers))
@@ -138,7 +135,6 @@ fun create_unique_list (numbers : int list) =
 	then [hd(numbers)]
 	else hd(numbers) :: create_unique_list(answ)
     end
-
 (* End of the helper functions. *)
 	
 (* Take a list of dates and return how many dates are
@@ -161,14 +157,13 @@ fun dates_in_months_challenge (dates : (int*int*int) list, months : int list) =
 	     dates_in_months(dates, unique_months)
 	 end
 
-(* Return the int at position pos of a int list. *)
+
 fun n_th_element (numbers : int list, pos : int) =
     if pos < 1
     then 0
     else if pos = 1
     then hd(numbers)
     else n_th_element (tl(numbers), pos - 1)
-		      
 (* Return true if the given date is reasonable. A reasonable date has a positive
    year, a month between 1 and 12 and a day between 1 and 31. Leap years are allowed. *)
 fun reasonable_date (date : (int*int*int)) =
@@ -184,7 +179,13 @@ fun reasonable_date (date : (int*int*int)) =
 			     else [31,28,31,30,31,30,31,31,30,31,30,31]
 	val lower_day = 1
 	val max_day = n_th_element(days_in_months, month)
-	
+
+	val year = #1 date
+	val month = #2 date
+	val day = #3 date
+		     
+	val is_leap = year mod 100 <> 0 andalso
+			(year mod 4 = 0 orelse year mod 400 = 0)	
 	val valid_year = year > 0	    
 	val valid_month = month >= 1 andalso month <= 12
 	val valid_day = day >= lower_day andalso day <= max_day
