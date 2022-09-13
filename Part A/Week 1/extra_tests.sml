@@ -140,17 +140,20 @@ val test_multiply_2 = multiply([(0, 0)]) = 0;
 val test_multiply_3 = multiply([(1, 1)]) = 1;
 val test_multiply_4 = multiply([(1, 0)]) = 0;
 val test_multiply_5 = multiply([(0, 1)]) = 0;
-val test_multiply_6 = multiply([(2, 2), (5, 1)]) = 20
-val test_multiply_7 = multiply([(2, 2), (3, 2)]) = 36
-val test_multiply_8 = multiply([(5, 1), (7, 1)]) = 35
-val test_multiply_9 = multiply([(2, 2), (5, 2)]) = 100
+val test_multiply_6 = multiply([(2, 2), (5, 1)]) = 20;
+val test_multiply_7 = multiply([(2, 2), (3, 2)]) = 36;
+val test_multiply_8 = multiply([(5, 1), (7, 1)]) = 35;
+val test_multiply_9 = multiply([(2, 2), (5, 2)]) = 100;
 
-val test_all_products_1 = all_products ([]) = []
-val test_all_products_2 = all_products ([(1, 0)]) = []
-val test_all_products_3 = all_products ([(0, 1)]) = [0]
-val test_all_products_4 = all_products ([(1, 1)]) = [1]
-val test_all_products_5 = all_products ([(2,3), (3,2)]) = [2, 3, 4, 8, 9]
-val test_all_products_6 = all_products ([(2,2), (5,1)]) = [2, 4, 5]
-val test_all_products_7 = all_products ([(2,2), (3,2)]) = [2, 3, 4, 9]
-val test_all_products_8 = all_products ([(5,1), (7,1)]) = [5, 7]
-val test_all_products_9 = all_products ([(2,2), (5,2)]) = [2, 4, 5, 25]
+val test_all_products_1 = all_products ([]) = [];
+val test_all_products_2 = all_products ([(1, 0)]) = [];
+val test_all_products_3 = all_products ([(0, 1)]) = [0];
+val test_all_products_4 = all_products ([(1, 1)]) = [1];
+val test_all_products_5 = all_products ([(2,3), (3,2)]) = [1, 2, 3, 4, 6, 8, 9,
+12, 18, 24, 36, 72];
+val test_all_products_6 = all_products ([(2,2), (5,1)]) = [1, 2, 4, 5, 10, 20];
+val test_all_products_7 = all_products ([(2,2), (3,2)]) = [1, 2, 3, 4, 6, 9, 12,
+18, 36];
+val test_all_products_8 = all_products ([(5,1), (7,1)]) = [1, 5, 7];
+val test_all_products_9 = all_products ([(2,2), (5,2)]) = [1, 2, 4, 5, 10, 20, 25, 50, 100];
+
