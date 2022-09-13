@@ -26,7 +26,12 @@ val test_number_passed_3 = number_passed [{ id = 12, grade = SOME 100 }, { id = 
 val test_number_passed_4 = number_passed [{ id = 1, grade = SOME 76 }, { id = 2, grade = SOME 82 },
 					  { id = 5, grade = SOME 96 }] = 3
 
-val test_number_misgraded_1 = false
+val test_number_misgraded_1 = number_misgraded([(pass, {id=0, grade=SOME 75})]) = 0;
+val test_number_misgraded_2 = number_misgraded([(fail, {id=0, grade=SOME 75})]) = 1;
+val test_number_misgraded_3 = number_misgraded([(fail, {id=0, grade=SOME 74})]) = 0;
+val test_number_misgraded_4 = number_misgraded([(fail, {id=0, grade=SOME 74}),
+                                                (fail, {id=1, grade=SOME 90}),
+                                                (pass, {id=2, grade=SOME 60})]) = 2;
 
 				  
 val test_tree_height_1 = tree_height (node { value = 0, left = node { value = 0,
@@ -102,4 +107,23 @@ val test_less_than_3 = less_than (ZERO, SUCC ZERO) = true
 val test_less_than_4 = less_than (SUCC ZERO, SUCC(SUCC ZERO)) = true
 val test_less_than_5 = less_than (SUCC(SUCC ZERO), SUCC ZERO) = false
 
-								    
+val test_isEmpty_1 = isEmpty (Elems []) = true
+val test_isEmpty_2 = isEmpty (Intersection (Elems [], Elems [1, 2, 3])) = true 
+val test_isEmpty_3 = isEmpty (Intersection (Range {from = 2, to = 3}, Elems [1,2])) = false 
+val test_isEmpty_4 = isEmpty (Range {from = 0, to = 0}) = true
+val test_isEmpty_5 = isEmpty (Range {from = 0, to = 5}) = false
+val test_isEmpty_6 = isEmpty (Intersection (Range {from=1, to=4}, Range {from=5, to=6})) = true
+val test_isEmpty_7 = isEmpty (Intersection (Intersection (Elems [5], Elems [1, 2, 3]), Union (Elems [1,2,3], Elems []))) = true
+val test_isEmpty_8 = isEmpty (Union (Elems [2], Range {from = 0, to = 0})) = false
+val test_isEmpty_9 = isEmpty (Union (Elems [], Range {from = 0, to = 0})) = true
+val test_isEmpty_10 = isEmpty (Union (Elems [], (Intersection (Elems [], Elems [1, 2, 3])))) = true
+
+val test_contains_1 = contains(Elems [], 23) = false
+val test_contains_2 = contains(Elems [5], 30) = false
+val test_contains_3 = contains(Elems [2, 6], 6) = true
+val test_contains_4 = contains(Range {from = 1, to = 4}, 0) = false
+val test_contains_5 = contains(Range {from = 1, to = 4}, 6) = false
+val test_contains_6 = contains(Range {from = 1, to = 4}, 2) = true
+val test_contains_7 = contains(Union (Elems [1,2], (Elems [3,6])), 5) = false
+val test_contains_8 = contains(Union (Elems [1,2,5], (Elems [3,6])), 5) = true
+
