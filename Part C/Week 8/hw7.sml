@@ -196,7 +196,9 @@ fun eval_prog (e,env) =
 	   | SOME (_,v) => v)
       | Let(s,e1,e2) => eval_prog (e2, ((s, eval_prog(e1,env)) :: env))
       | Intersect(e1,e2) => intersect(eval_prog(e1,env), eval_prog(e2, env))
-      (* CHANGED: Add a case for Shift expressions *)
+      (* Add a case for Shift expressions *)
+      (* eval the expression and return the same expression 
+      * with de x shifted by dx and y by dy. *)
       | Shift(dx, dy, exp) => let val anws = eval_prog(exp, env)
 			      in
 				  case anws of
@@ -208,7 +210,7 @@ fun eval_prog (e,env) =
 				    | _ => raise Impossible "Tried to shift a non value."
 			      end
 				 
-(* CHANGED: Add function preprocess_prog of type geom_exp -> geom_exp *)
+(* Add function preprocess_prog of type geom_exp -> geom_exp *)
 fun preprocess_prog e =
     case e of
 	NoPoints => e 
@@ -219,6 +221,13 @@ fun preprocess_prog e =
       | Intersect (e1, e2) => Intersect(preprocess_prog e1, preprocess_prog e2)
       | Let(s, e1, e2) => Let(s, preprocess_prog e1, preprocess_prog e2)
       | Shift(dx, dy, exp) => Shift(dx, dy, preprocess_prog exp)
+      (* no LineSegment anywhere in the expression has endpoints that are the
+      * same as (real close) each other. Such a LineSegment should be replaced
+      * with the appropriate Point.*)
+      (* Every LineSegment has its first endpoint (the first two real values in SML) to the left (lower x-value)
+        of the second endpoint. If the x-coordinates of the two endpoints are the same (real close), then the
+        LineSegment has its first endpoint below (lower y-value) the second endpoint. For any LineSegment
+        not meeting this requirement, replace it with a LineSegment with the same endpoints reordered.*)
       | LineSegment(x1,y1,x2,y2) => if real_close_point (x1, y1) (x2, y2)
 				    then Point(x1, y1)
 				    else if x1 < x2
