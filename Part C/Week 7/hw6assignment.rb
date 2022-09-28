@@ -5,6 +5,8 @@
 
 class MyPiece < Piece
   # The constant All_My_Pieces should be declared here
+  # instead of the pieces being randomly (and uniformly) chosen from the 7 classic pieces, the pieces are randomly (and uniformly) chosen from 10 pieces. They are the classic 7 and these 3: 5-long, utah, short-L.
+  #The initial rotation for each piece is also chosen randomly.
   All_My_Pieces = All_Pieces + [
     [[[0, 0],[-1, 0], [1, 0], [2, 0], [-2,0]], # 5-long
      [[0, 0], [0, -1], [0, 1], [0, 2], [0, -2]]],
@@ -30,14 +32,9 @@ class MyBoard < Board
     @cheat = false
   end
   
-  def rotate_180_degrees
-    if !game_over? and @game.is_running?
-      @current_block.move(0, 0, 2)
-    end
-    draw
-  end
-
-  def next_piece
+  
+    def next_piece
+    #if cheat is possible, the next piece is a 1x1 block
     if @cheat
       @current_block = MyPiece.new([[[0, 0]]], self)
       @cheat = false
@@ -47,6 +44,7 @@ class MyBoard < Board
     @current_pos = nil
   end
   
+    #  If the score is less than 100, nothing happens. Else the player loses 100 points (cheating costs you) and the next piece is a 1x1 block.
   def cheat
     if @score >= 100 and !@cheat_count
       @cheat = true
@@ -57,7 +55,7 @@ class MyBoard < Board
   def store_current
     locations = @current_block.current_rotation
     displacement = @current_block.position
-    i = locations.length() - 1
+    i = @current_block.num_blocks
     (0..i).each{|index| 
       current = locations[index];
       @grid[current[1]+displacement[1]][current[0]+displacement[0]] = 
@@ -81,11 +79,12 @@ class MyTetris < Tetris
   end
 
   def key_bindings
-    
     super
-    
-    @root.bind('u', proc {@board.rotate_180_degrees})
 
+#the player can press the ’u’ key to make the piece that is falling rotate 180 degrees.
+    @root.bind('u', proc {@board.rotate_clockwise; @board.rotate_clockwise})
+
+#
     @root.bind('c', proc {@board.cheat})
   end
   
